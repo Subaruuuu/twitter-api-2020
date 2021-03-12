@@ -99,8 +99,15 @@ const userService = {
         include: [
           { model: User, as: 'Followers' },
           { model: User, as: 'Followings' },
-          { model: Tweet }
-        ]
+          {
+            model: Tweet, include: [
+              { model: Like },
+              { model: Reply }
+            ],
+            order: [[{ model: Reply }, 'createdAt', 'DESC']]
+          }
+        ],
+        order: [[{ model: Tweet }, 'createdAt', 'DESC']]
       })
       if (!user) return callback({ status: 'error', message: 'User not found', statusCode: 400 })
       callback(user)
@@ -197,7 +204,8 @@ const userService = {
         include: [
           { model: Like },
           { model: Reply }
-        ]
+        ],
+        order: [['createdAt', 'DESC']]
       })
       callback(tweets)
     } catch (err) {
@@ -212,7 +220,8 @@ const userService = {
         where: { UserId: req.params.id },
         include: [
           { model: Tweet, include: [{ model: User }, { model: Like }, { model: Reply }] }
-        ]
+        ],
+        order: [['createdAt', 'DESC']]
       })
       callback(replies)
     } catch (err) {
