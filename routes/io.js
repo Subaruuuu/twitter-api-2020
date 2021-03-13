@@ -2,7 +2,7 @@ module.exports = (io) => {
   let numUsers = 0
   io.on('connection', socket => {
     console.log('Socket.io 建立起通訊')
-
+    let userList = []
     let addedUser = false
 
     //使用者進入
@@ -44,13 +44,10 @@ module.exports = (io) => {
       })
     })
 
-    socket.on('judy', judy => {
-      console.log(judy)
-    })
-
     // runs when client disconnects
     // client must have socket.emit
-    socket.on('disconnect', () => {
+    socket.on('disconnect', (data) => {
+      console.log('disconnect: ', data)
       if (addedUser) {
         --numUsers;
 
