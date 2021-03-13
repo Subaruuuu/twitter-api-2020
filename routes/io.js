@@ -39,7 +39,8 @@ module.exports = (io) => {
       // client must have socket.on
       socket.broadcast.emit('new message', {
         username: socket.username,
-        message: data
+        message: data.message,
+        type: data.type
       })
     })
 
