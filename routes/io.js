@@ -8,7 +8,7 @@ module.exports = (io) => {
     //使用者進入
     //前段要有 socket.emit
     socket.on('add user', (username) => {
-      // if (addedUser) return
+      if (addedUser) return
       console.log(username)
       // console.log(socket)
 
@@ -50,13 +50,15 @@ module.exports = (io) => {
     // runs when client disconnects
     // client must have socket.emit
     socket.on('disconnect', () => {
-      --numUsers
-      // io.emit('message', 'A user has left the chat')
+      if (addedUser) {
+        --numUsers;
 
-      socket.broadcast.emit('user left', {
-        username: socket.username,
-        numUsers: numUsers
-      })
+        // echo globally that this client has left
+        socket.broadcast.emit('user left', {
+          username: socket.username,
+          numUsers: numUsers
+        })
+      }
     })
   })
 }
