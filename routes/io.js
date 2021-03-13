@@ -1,23 +1,29 @@
+const sequelize = require('sequelize')
+const db = require('../models')
+const { Followship, User } = db
+
+
 module.exports = (io) => {
   let numUsers = 0
+
   io.on('connection', socket => {
     console.log('Socket.io 建立起通訊')
-    let userList = []
+
     let addedUser = false
 
     //使用者進入
     //前段要有 socket.emit
-    socket.on('add user', (username) => {
+    socket.on('add user', (user) => {
       if (addedUser) return
-      console.log(username)
+      console.log(user)
       // console.log(socket)
 
       // store the username in the socket session for this client
-      socket.username = username;
+      socket.username = user.name;
       ++numUsers  //在線人數
       addedUser = true
 
-      // 前端有要 socket.on
+      // 上線人數
       socket.emit('login', {
         numUsers: numUsers
       })
