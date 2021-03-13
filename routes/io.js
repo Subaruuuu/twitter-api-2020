@@ -9,6 +9,8 @@ module.exports = (io) => {
     //前段要有 socket.emit
     socket.on('add user', (username) => {
       // if (addedUser) return
+      console.log(username)
+      // console.log(socket)
 
       // store the username in the socket session for this client
       socket.username = username;
