@@ -11,7 +11,6 @@ module.exports = (io) => {
     })
 
     // runs when client disconnects
-    // 使用者離開後，針對頻道內所有人發出的離線訊息
     socket.on('disconnect', () => {
       io.emit('message', 'A user has left the chat')
     })
