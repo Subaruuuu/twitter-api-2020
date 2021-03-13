@@ -22,7 +22,7 @@ const io = require("socket.io")(socketServer, {
 app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use('/upload', express.static(__dirname + '/upload'))
-app.use(express.static(path.join(__dirname, 'public')))
+// app.use(express.static(path.join(__dirname, 'public')))
 app.use(cors())
 
 const swaggerUi = require('swagger-ui-express')
