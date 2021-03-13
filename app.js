@@ -7,6 +7,10 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 
 const app = express()
+const socket = require('socket.io')
+const http = require('http')
+const server = http.createServer(app)
+const io = socket(server)
 const port = process.env.PORT || 3000
 
 app.use(express.json())
@@ -23,5 +27,6 @@ app.get('/', (req, res) => res.send('請使用API接口'))
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
 
 require('./routes')(app)
+require('./routes/io')(io)
 
 module.exports = app
