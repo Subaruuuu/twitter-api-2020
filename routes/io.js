@@ -1,68 +1,69 @@
 const sequelize = require('sequelize')
 const db = require('../models')
 const { Followship, User } = db
+let onlineUserList = []
 
 
 module.exports = (io) => {
-  let numUsers = 0
-
   io.on('connection', socket => {
     console.log('Socket.io 建立起通訊')
+    let userAccount
 
-    let addedUser = false
-
-    //使用者進入
-    //前段要有 socket.emit
     socket.on('add user', (user) => {
-      if (addedUser) return
       console.log(user)
-      // console.log(socket)
 
-      // store the username in the socket session for this client
-      socket.username = user.name;
-      ++numUsers  //在線人數
-      addedUser = true
+      socket.user = user
+      userAccount = user.account
 
-      // 上線人數
-      socket.emit('login', {
-        numUsers: numUsers
-      })
+      const list = onlineUserList.map(user => user.account)
+      if (list.indexOf(user.account) === -1) {
+        onlineUserList.push(user)
+      }
 
-      // echo globally (all clients) that a person has connected
-      // 前端要有 socket.on
+
       socket.broadcast.emit('user join public chat', {
-        username: socket.username
-        // numUsers: numUsers
+        user: user,
+        onlineUserList: onlineUserList
       })
     })
 
-    // client emits "new message", this listengs and executes
-    // clinet must have socket.emit
+    socket.on('reconnect', (user) => {
+      console.log('reconnect: ', user)
+
+      const list = onlineUserList.map(user => user.account)
+      if (list.indexOf(user.account) === -1) {
+        onlineUserList.push(user)
+      }
+
+      socket.broadcast.emit('user reconnect', {
+        user: user,
+        onlineUserList: onlineUserList
+      })
+    })
+
     socket.on('new message', (data) => {
       console.log('new message: ', data)
 
-      // we tell the client to execute 'new message'
-      // client must have socket.on
       socket.broadcast.emit('new message', {
-        username: socket.username,
+        id: data.id,
         message: data.message,
-        type: data.type
+        avatar: data.avatar
       })
     })
 
-    // runs when client disconnects
-    // client must have socket.emit
-    socket.on('disconnect', (data) => {
-      console.log('disconnect: ', data)
-      if (addedUser) {
-        --numUsers;
+    socket.on('disconnect', (reason) => {
+      console.log('disconnect: ', reason)
+      // console.log(socket)
 
-        // echo globally that this client has left
-        socket.broadcast.emit('user left', {
-          username: socket.username,
-          numUsers: numUsers
-        })
+      const list = onlineUserList.map(user => user.account)
+      if (list.indexOf(userAccount) >= 0) {
+        onlineUserList.splice(list.indexOf(userAccount), 1)
       }
+
+      socket.broadcast.emit('user left', {
+        user: socket.user
+      })
+
     })
   })
 }
